@@ -1,16 +1,19 @@
 import { useState } from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { Activity, LogOut, Menu, X } from 'lucide-react';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Activity, LogOut, Menu, X, Bell } from 'lucide-react';
 import { TOKEN_KEY } from '../lib/api';
 
 export default function AppLayout() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const handleLogout = () => {
         localStorage.removeItem(TOKEN_KEY);
         navigate('/login');
     };
+
+    const isActive = (path: string) => location.pathname === path;
 
     return (
         <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -38,7 +41,6 @@ export default function AppLayout() {
                             <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                             <span className="text-lg sm:text-xl font-bold text-gray-900">WatchTower</span>
                         </div>
-                        {/* Close button for mobile */}
                         <button
                             onClick={() => setSidebarOpen(false)}
                             className="lg:hidden p-1 text-gray-400 hover:text-gray-600"
@@ -54,9 +56,26 @@ export default function AppLayout() {
                                 <Link
                                     to="/dashboard"
                                     onClick={() => setSidebarOpen(false)}
-                                    className="flex items-center gap-3 px-4 py-2.5 text-sm sm:text-base text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                                    className={`flex items-center gap-3 px-4 py-2.5 text-sm sm:text-base rounded-lg transition-colors ${isActive('/dashboard')
+                                            ? 'bg-blue-50 text-blue-600 font-medium'
+                                            : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
                                 >
+                                    <Activity className="w-5 h-5" />
                                     Dashboard
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/alerts"
+                                    onClick={() => setSidebarOpen(false)}
+                                    className={`flex items-center gap-3 px-4 py-2.5 text-sm sm:text-base rounded-lg transition-colors ${isActive('/alerts')
+                                            ? 'bg-blue-50 text-blue-600 font-medium'
+                                            : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                >
+                                    <Bell className="w-5 h-5" />
+                                    Alerts
                                 </Link>
                             </li>
                         </ul>
@@ -89,7 +108,7 @@ export default function AppLayout() {
                         <Activity className="w-6 h-6 text-blue-600" />
                         <span className="text-lg font-bold text-gray-900">WatchTower</span>
                     </div>
-                    <div className="w-10" /> {/* Spacer for centering */}
+                    <div className="w-10" />
                 </header>
 
                 {/* Page Content */}

@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import MonitorDetailPage from './pages/MonitorDetailPage';
+import AlertsPage from './pages/AlertsPage';
 import StatusPage from './pages/StatusPage';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/monitors/:id" element={<MonitorDetailPage />} />
+            <Route path="/alerts" element={<AlertsPage />} />
           </Route>
         </Route>
 
