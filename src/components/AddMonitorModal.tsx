@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { X } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../lib/api';
 
 interface AddMonitorModalProps {
@@ -14,12 +15,10 @@ export default function AddMonitorModal({ isOpen, onClose, onMonitorAdded }: Add
         url: '',
         interval: 5
     });
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setError('');
         setLoading(true);
 
         try {
@@ -28,10 +27,8 @@ export default function AddMonitorModal({ isOpen, onClose, onMonitorAdded }: Add
             onMonitorAdded();
             onClose();
         } catch (err: any) {
-            setError(
-                err.response?.data?.error?.message ||
-                'Failed to create monitor. Please try again.'
-            );
+            const message = err.response?.data?.error?.message || 'Failed to create monitor';
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -41,36 +38,30 @@ export default function AddMonitorModal({ isOpen, onClose, onMonitorAdded }: Add
 
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-            {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black bg-opacity-50"
+                className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
                 onClick={onClose}
             />
 
-            {/* Modal - Slides up on mobile, centered on desktop */}
-            <div className="relative w-full sm:w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-lg shadow-xl animate-slide-up sm:animate-none max-h-[90vh] sm:max-h-[85vh] overflow-y-auto">
-                {/* Handle bar for mobile */}
+            <div className="relative w-full sm:w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-lg shadow-xl animate-slide-up sm:animate-none max-h-[90vh] overflow-y-auto">
                 <div className="sm:hidden flex justify-center pt-3 pb-2">
                     <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
                 </div>
 
                 <div className="p-4 sm:p-6">
-                    {/* Header */}
                     <div className="flex items-center justify-between mb-4 sm:mb-6">
                         <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                             Add Monitor
                         </h2>
                         <button
                             onClick={onClose}
-                            className="p-1.5 sm:p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                            className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
                         >
                             <X className="w-5 h-5 sm:w-6 sm:h-6" />
                         </button>
                     </div>
 
-                    {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-                        {/* Name Field */}
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                                 Monitor Name
@@ -86,7 +77,6 @@ export default function AddMonitorModal({ isOpen, onClose, onMonitorAdded }: Add
                             />
                         </div>
 
-                        {/* URL Field */}
                         <div>
                             <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">
                                 URL
@@ -102,7 +92,6 @@ export default function AddMonitorModal({ isOpen, onClose, onMonitorAdded }: Add
                             />
                         </div>
 
-                        {/* Interval Field */}
                         <div>
                             <label htmlFor="interval" className="block text-sm font-medium text-gray-700 mb-1">
                                 Check Interval (minutes)
@@ -120,26 +109,19 @@ export default function AddMonitorModal({ isOpen, onClose, onMonitorAdded }: Add
                             <p className="mt-1 text-xs text-gray-500">Between 1 and 60 minutes</p>
                         </div>
 
-                        {/* Error Message */}
-                        {error && (
-                            <div className="p-3 text-xs sm:text-sm text-red-600 bg-red-50 rounded-lg">
-                                {error}
-                            </div>
-                        )}
-
-                        {/* Buttons */}
                         <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 pt-2">
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="w-full sm:flex-1 px-4 py-2.5 sm:py-2 text-sm sm:text-base text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                                disabled={loading}
+                                className="w-full sm:flex-1 px-4 py-2.5 sm:py-2 text-sm sm:text-base text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full sm:flex-1 px-4 py-2.5 sm:py-2 text-sm sm:text-base text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full sm:flex-1 px-4 py-2.5 sm:py-2 text-sm sm:text-base text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 {loading ? 'Creating...' : 'Create Monitor'}
                             </button>
