@@ -1,12 +1,12 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { Activity, LogOut } from 'lucide-react';
+import { TOKEN_KEY } from '../lib/api';
 
 export default function AppLayout() {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem(TOKEN_KEY);
         navigate('/login');
     };
 

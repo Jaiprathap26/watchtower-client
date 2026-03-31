@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AppLayout from './layouts/AppLayout';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import ProtectedRoute from './components/ProtectedRoute';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import MonitorDetail from './pages/MonitorDetail';
 import StatusPage from './pages/StatusPage';
@@ -11,14 +12,16 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/status/:userId" element={<StatusPage />} />
 
-        {/* Protected routes with layout */}
-        <Route element={<AppLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/monitors/:id" element={<MonitorDetail />} />
+        {/* Protected routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/monitors/:id" element={<MonitorDetail />} />
+          </Route>
         </Route>
 
         {/* Redirect root to dashboard */}
