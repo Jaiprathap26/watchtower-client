@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, RefreshCw } from 'lucide-react';
+import { Plus, RefreshCw, Share2 } from 'lucide-react';
 import api from '../lib/api';
 import MonitorCard from '../components/MonitorCard';
 import AddMonitorModal from '../components/AddMonitorModal';
@@ -18,6 +18,13 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [userId, setUserId] = useState<string>('');
+    const [showCopied, setShowCopied] = useState(false);
+
+    useEffect(() => {
+        fetchMonitors();
+        fetchUserId();
+    }, []);
 
     const fetchMonitors = async () => {
         try {
@@ -31,9 +38,14 @@ export default function DashboardPage() {
         }
     };
 
-    useEffect(() => {
-        fetchMonitors();
-    }, []);
+    const fetchUserId = async () => {
+        try {
+            const response = await api.get('/api/auth/me');
+            setUserId(response.data.id);
+        } catch (error) {
+            console.error('Failed to fetch user ID:', error);
+        }
+    };
 
     const handleMonitorAdded = () => {
         fetchMonitors();
@@ -42,6 +54,13 @@ export default function DashboardPage() {
     const handleRefresh = () => {
         setRefreshing(true);
         fetchMonitors();
+    };
+
+    const handleShareStatus = () => {
+        const statusUrl = `${window.location.origin}/status/${userId}`;
+        navigator.clipboard.writeText(statusUrl);
+        setShowCopied(true);
+        setTimeout(() => setShowCopied(false), 2000);
     };
 
     if (loading) {
@@ -54,7 +73,7 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header - Responsive */}
+            {/* Header */}
             <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     {/* Title Section */}
@@ -69,11 +88,30 @@ export default function DashboardPage() {
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2">
+                        {/* Share Status Page Button */}
+                        {userId && (
+                            <div className="relative">
+                                <button
+                                    onClick={handleShareStatus}
+                                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                    title="Share public status page"
+                                >
+                                    <Share2 className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Share Status</span>
+                                </button>
+                                {showCopied && (
+                                    <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap shadow-lg">
+                                        Link copied to clipboard!
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {/* Refresh Button */}
                         <button
                             onClick={handleRefresh}
                             disabled={refreshing}
-                            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             title="Refresh monitors"
                         >
                             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
@@ -83,7 +121,7 @@ export default function DashboardPage() {
                         {/* Add Monitor Button */}
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 whitespace-nowrap"
+                            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 whitespace-nowrap transition-colors"
                         >
                             <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                             <span className="hidden xs:inline">Add</span>
@@ -111,14 +149,14 @@ export default function DashboardPage() {
                         </p>
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                            className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
                         >
                             <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                             Add Your First Monitor
                         </button>
                     </div>
                 ) : (
-                    /* Monitor Grid - Responsive */
+                    /* Monitor Grid */
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                         {monitors.map((monitor) => (
                             <MonitorCard key={monitor.id} monitor={monitor} />
